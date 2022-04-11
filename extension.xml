@@ -7,18 +7,18 @@
     <properties>
     	<name>Feature: Untrue Effects</name>
 		<version>1</version>
-		<loadorder>0</loadorder>
+		<loadorder>100</loadorder>
 		<description>
-			<text>Feature: Untrue Effects ver. 0.11 by Berwind</text>
+			<text>Feature: Untrue Effects ver. 0.12 by Berwind</text>
 			<author>Berwind</author>
 		</description>
 		<ruleset>
 			<name>5E</name>
 		</ruleset>
 	</properties>
-    <announcement text="IF NOT - Untrue Effects ver. 0.11 - USE IFN and IFTN to check if conditional is untrue" icon="berwind" font="chatfont"/>
+    <announcement text="IF NOT - Untrue Effects ver. 0.12 - USE IFN and IFTN to check if conditional is untrue" icon="IFN" font="chatfont"/>
 	<base>
-    	<script name="EffectManager5E" file="scripts/manager_effect_untrue.lua"/>
-		<icon name="berwind" file="graphics/logos/ifn_small.png" />
+    	<script name="EffectManagerUntrue" file="scripts/manager_effect_untrue.lua"/>
+		<icon name="IFN" file="graphics/logos/ifn_small.png" />
 	</base>
  </root>
