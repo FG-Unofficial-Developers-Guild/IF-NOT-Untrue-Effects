@@ -431,7 +431,7 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
-		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and EffectManagerADND.isValidCheckEffect(rActor,v)) and not StringManager.contains(aIgnore, v.getPath())) then
+		if (((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and EffectManagerADND.isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath())) then
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
 			local aEffectComps = EffectManager.parseEffect(sLabel);
