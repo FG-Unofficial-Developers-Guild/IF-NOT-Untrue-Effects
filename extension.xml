@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?><!--
+	File: extension.xml
+	Author: Berwind
+	Purpose: add functionality to IF effect statements
+ -->
+<root>
+    <properties>
+    	<name>Feature: Untrue Effects ver. 0.11 by Berwind</name>
+		<version>1</version>
+		<loadorder>0</loadorder>
+		<description>
+			<text>Feature: Untrue Effects ver. 0.11 by Berwind</text>
+			<author>Berwind</author>
+		</description>
+		<ruleset>
+			<name>5E</name>
+		</ruleset>
+	</properties>
+    <announcement text="Feature: Untrue Effects ver. 0.11 - USE IFN and IFTN to check if conditional is untrue" icon="berwind" font="chatfont"/>
+	<base>
+    	<script name="EffectManager5E" file="scripts/manager_effect_untrue.lua"/>
+		<icon name="berwind" file="graphics/logos/ifn_small.png" />
+	</base>
+ </root>
