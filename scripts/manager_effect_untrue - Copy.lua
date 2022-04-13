@@ -32,13 +32,6 @@ function onInit()
 
 	checkConditionalHelperOriginal = EffectManager5E.checkConditionalHelper;
 	EffectManager5E.checkConditionalHelper = checkConditionalHelper;
-
-	registerOptions();
-end
-
-function registerOptions()
-	OptionsManager.registerOption2('NO_TARGET', false, 'option_header_game', 'opt_ifn_no_target', 'option_entry_cycler', 
-		{ labels = 'opt_val_off', values = 'off', baselabel = 'opt_val_on', baseval = 'on', default = 'off' })
 end
 
 function onEffectActorStartTurn(nodeActor, nodeEffect)
@@ -221,9 +214,6 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 						end
 						bTargeted = true;
 					elseif rEffectComp.type == "IFTN" then
-						if OptionsManager.isOption('NO_TARGET', 'off') and not rFilterActor then
-							break;
-						end
 						if checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
 							break;
 						end
@@ -378,9 +368,6 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 						break;
 					end
 				elseif rEffectComp.type == "IFTN" then
-					if OptionsManager.isOption('NO_TARGET', 'off') and not rTarget then
-						break;
-					end
 					if checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
 						break;
 					end
@@ -464,9 +451,6 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 						break;
 					end
 				elseif rEffectComp.type == "IFTN" then
-					if OptionsManager.isOption('NO_TARGET', 'off') and not rTarget then
-						break;
-					end
 					if checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
 						break;
 					end
