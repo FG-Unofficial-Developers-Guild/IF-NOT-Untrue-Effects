@@ -28,10 +28,10 @@ function onInit()
 	registerOptions();
 end
 
-function registerOptions()
+--[[function registerOptions()
 	OptionsManager.registerOption2('NO_TARGET', false, 'option_header_game', 'opt_ifn_no_target', 'option_entry_cycler', 
 		{ labels = 'opt_val_off', values = 'off', baselabel = 'opt_val_on', baseval = 'on', default = 'off' })
-end
+end]]
 
 function onEffectActorStartTurn(nodeActor, nodeEffect)
 	local sEffName = DB.getValue(nodeEffect, "label", "");
