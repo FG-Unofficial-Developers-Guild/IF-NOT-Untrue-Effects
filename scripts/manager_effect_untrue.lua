@@ -1,9 +1,7 @@
 local onEffectActorStartTurnOriginal;
-local parseEffectCompOriginal;
 local removeEffectByTypeOriginal;
 local getEffectsByTypeOriginal;
 local hasEffectOriginal;
-local checkConditionalOriginal;
 local checkConditionalHelperOriginal;
 local debug = false;
 
@@ -15,9 +13,6 @@ function onInit()
 	onEffectActorStartTurnOriginal = EffectManager5E.onEffectActorStartTurn;
 	EffectManager5E.onEffectActorStartTurn = onEffectActorStartTurn;
 
-	parseEffectCompOriginal = EffectManager5E.parseEffectComp;
-	EffectManager5E.parseEffectComp = parseEffectComp;
-
 	removeEffectByTypeOriginal = EffectManager5E.removeEffectByType;
 	EffectManager5E.removeEffectByType = removeEffectByType;
 
@@ -26,9 +21,6 @@ function onInit()
 
 	hasEffectOriginal = EffectManager5E.hasEffect;
 	EffectManager5E.hasEffect = hasEffect;
-
-	checkConditionalOriginal = EffectManager5E.checkConditional;
-	EffectManager5E.checkConditional = checkConditional;
 
 	checkConditionalHelperOriginal = EffectManager5E.checkConditionalHelper;
 	EffectManager5E.checkConditionalHelper = checkConditionalHelper;
@@ -45,7 +37,7 @@ function onEffectActorStartTurn(nodeActor, nodeEffect)
 	local sEffName = DB.getValue(nodeEffect, "label", "");
 	local aEffectComps = EffectManager.parseEffect(sEffName);
 	for _,sEffectComp in ipairs(aEffectComps) do
-		local rEffectComp = parseEffectComp(sEffectComp);
+		local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
 		-- Conditionals
 		if rEffectComp.type == "IFT" then
 			break;
@@ -53,12 +45,12 @@ function onEffectActorStartTurn(nodeActor, nodeEffect)
 			break;
 		elseif rEffectComp.type == "IF" then
 			local rActor = ActorManager.resolveActor(nodeActor);
-			if not checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
+			if not EffectManager5E.checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
 				break;
 			end
 		elseif rEffectComp.type == "IFN" then
 			local rActor = ActorManager.resolveActor(nodeActor);
-			if checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
+			if EffectManager5E.checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
 				break;
 			end
 		
@@ -89,10 +81,6 @@ function onEffectActorStartTurn(nodeActor, nodeEffect)
 	end
 end
 
-function parseEffectComp(s)
-	return parseEffectCompOriginal(s);
-end
-
 function removeEffectByType(nodeCT, sEffectType)
 	if not sEffectType then
 		return;
@@ -113,7 +101,7 @@ function removeEffectByType(nodeCT, sEffectType)
 			local aEffectComps = EffectManager.parseEffect(s);
 			local nComp = 1;
 			for _,sEffectComp in ipairs(aEffectComps) do
-				local rEffectComp = parseEffectComp(sEffectComp);
+				local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
 				-- Check conditionals
 				if rEffectComp.type == "IFT" then
 					break;
@@ -121,12 +109,12 @@ function removeEffectByType(nodeCT, sEffectType)
 					break;
 				elseif rEffectComp.type == "IF" then
 					local rActor = ActorManager.resolveActor(nodeActor);
-					if not checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
+					if not EffectManager5E.checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
 						break;
 					end
 				elseif rEffectComp.type == "IFN" then
 					local rActor = ActorManager.resolveActor(nodeActor);
-					if checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
+					if EffectManager5E.checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
 						break;
 					end
 				
@@ -202,21 +190,21 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 				-- Look for type/subtype match
 				local nMatch = 0;
 				for kEffectComp,sEffectComp in ipairs(aEffectComps) do
-					local rEffectComp = parseEffectComp(sEffectComp);
+					local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
 					-- Handle conditionals
 					if rEffectComp.type == "IF" then
-						if not checkConditional(rActor, v, rEffectComp.remainder) then
+						if not EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder) then
 							break;
 						end
 					elseif rEffectComp.type == "IFN" then
-						if checkConditional(rActor, v, rEffectComp.remainder) then
+						if EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder) then
 							break;
 						end
 					elseif rEffectComp.type == "IFT" then
 						if not rFilterActor then
 							break;
 						end
-						if not checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
+						if not EffectManager5E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
 							break;
 						end
 						bTargeted = true;
@@ -224,7 +212,7 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 						if OptionsManager.isOption('NO_TARGET', 'off') and not rFilterActor then
 							break;
 						end
-						if checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
+						if EffectManager5E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
 							break;
 						end
 						bTargeted = true;
@@ -360,28 +348,28 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 			-- Iterate through each effect component looking for a type match
 			local nMatch = 0;
 			for kEffectComp,sEffectComp in ipairs(aEffectComps) do
-				local rEffectComp = parseEffectComp(sEffectComp);
+				local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
 				-- Handle conditionals
 				if rEffectComp.type == "IF" then
-					if not checkConditional(rActor, v, rEffectComp.remainder) then
+					if not EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder) then
 						break;
 					end
 				elseif rEffectComp.type == "IFN" then
-					if checkConditional(rActor, v, rEffectComp.remainder) then
+					if EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder) then
 						break;
 					end
 				elseif rEffectComp.type == "IFT" then
 					if not rTarget then
 						break;
 					end
-					if not checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
+					if not EffectManager5E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
 						break;
 					end
 				elseif rEffectComp.type == "IFTN" then
 					if OptionsManager.isOption('NO_TARGET', 'off') and not rTarget then
 						break;
 					end
-					if checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
+					if EffectManager5E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
 						break;
 					end
 				
@@ -423,10 +411,6 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 	return false;
 end
 
-function checkConditional(rActor, nodeEffect, aConditions, rTarget, aIgnore)
-	return checkConditionalOriginal(rActor, nodeEffect, aConditions, rTarget, aIgnore);
-end
-
 function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	
 	if debug == true then
@@ -445,29 +429,29 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 
 			-- Iterate through each effect component looking for a type match
 			for _,sEffectComp in ipairs(aEffectComps) do
-				local rEffectComp = parseEffectComp(sEffectComp);
+				local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
 				
 				-- CHECK CONDITIONALS
 				if rEffectComp.type == "IF" then
-					if not checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
+					if not EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
 						break;
 					end
 				elseif rEffectComp.type == "IFN" then
-					if checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
+					if EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
 						break;
 					end
 				elseif rEffectComp.type == "IFT" then
 					if not rTarget then
 						break;
 					end
-					if not checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
+					if not EffectManager5E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
 						break;
 					end
 				elseif rEffectComp.type == "IFTN" then
 					if OptionsManager.isOption('NO_TARGET', 'off') and not rTarget then
 						break;
 					end
-					if checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
+					if EffectManager5E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
 						break;
 					end
 				
