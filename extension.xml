@@ -16,7 +16,7 @@
 			<name>5E</name>
 		</ruleset>
 	</properties>
-    <announcement text="IF NOT - Untrue Effects ver. 0.2 - USE IFN and IFTN to check if conditional is untrue" icon="IFN" font="chatfont"/>
+    <announcement text="IF NOT - Untrue Effects ver. 0.21 - USE IFN and IFTN to check if conditional is untrue" icon="IFN" font="chatfont"/>
 	<base>
     	<script name="EffectManagerUntrue" file="scripts/manager_effect_untrue.lua"/>
 		<includefile source="strings/untrue_options.xml"/>

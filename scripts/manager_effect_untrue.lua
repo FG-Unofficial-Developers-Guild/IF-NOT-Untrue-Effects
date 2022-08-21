@@ -4,12 +4,14 @@ local getEffectsByTypeOriginal;
 local hasEffectOriginal;
 local checkConditionalHelperOriginal;
 local debug = false;
+local ifnCompatability = {}
+
 
 function onInit()
 	if debug == true then
 		print("init");
 	end
-	
+
 	onEffectActorStartTurnOriginal = EffectManager5E.onEffectActorStartTurn;
 	EffectManager5E.onEffectActorStartTurn = onEffectActorStartTurn;
 
@@ -25,8 +27,15 @@ function onInit()
 	checkConditionalHelperOriginal = EffectManager5E.checkConditionalHelper;
 	EffectManager5E.checkConditionalHelper = checkConditionalHelper;
 
-	registerOptions();
+	--registerOptions();
+
+
+	for index, name in pairs(Extension.getExtensions()) do
+		ifnCompatability[name] = index
+	end
+	--registerOptions();
 end
+
 
 --[[function registerOptions()
 	OptionsManager.registerOption2('NO_TARGET', false, 'option_header_game', 'opt_ifn_no_target', 'option_entry_cycler', 
@@ -59,6 +68,9 @@ function onEffectActorStartTurn(nodeActor, nodeEffect)
 			local nActive = DB.getValue(nodeEffect, "isactive", 0);
 			if nActive == 2 then
 				if rEffectComp.type == "REGEN" then
+					if extensions["AdvancedEffects"] then
+						print("hi mom")
+					end
 					local rActor = ActorManager.resolveActor(nodeActor);
 					if (ActorHealthManager.getWoundPercent(rActor) >= 1) then 
 						break;
@@ -92,7 +104,7 @@ function removeEffectByType(nodeCT, sEffectType)
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- Thanks Kel
 		--if (nActive ~= 0) then
-		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and EffectManagerADND.isValidCheckEffect(rActor,v))) then
+		if ((not ifnCompatability["AdvancedEffects"] and nActive ~= 0) or (ifnCompatability["AdvancedEffects"] and EffectManagerADND.isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY
 			local s = DB.getValue(nodeEffect, "label", "");
 			
@@ -169,7 +181,12 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 			end
 		end
 	end
-	
+	-- COMPATIBILITY FOR ADVANCED EFFECTS
+	if ifnCompatability["AdvancedEffects"] then
+		-- Determine effect type targeting
+		local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
+	end
+
 	-- Iterate through effects
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		-- Check active
@@ -177,7 +194,7 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 		-- COMPATIBILITY FOR ADVANCED EFFECTS
 		-- Thanks Kel
 		--if (nActive ~= 0) then
-		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and EffectManagerADND.isValidCheckEffect(rActor,v))) then
+		if ((not ifnCompatability["AdvancedEffects"] and nActive ~= 0) or (ifnCompatability["AdvancedEffects"] and EffectManagerADND.isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY
 			local sLabel = DB.getValue(v, "label", "");
 			local sApply = DB.getValue(v, "apply", "");
@@ -209,7 +226,7 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 						end
 						bTargeted = true;
 					elseif rEffectComp.type == "IFTN" then
-						if OptionsManager.isOption('NO_TARGET', 'off') and not rFilterActor then
+						if --[[OptionsManager.isOption('NO_TARGET', 'off') and]] not rFilterActor then
 							break;
 						end
 						if EffectManager5E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
@@ -338,13 +355,12 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 		-- Thanks Kel
 		-- to add support for AE in other extensions, make this change
 		-- original line: if nActive ~= 0 then
-		if ((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and EffectManagerADND.isValidCheckEffect(rActor,v))) then
+		if ((not ifnCompatability["AdvancedEffects"] and nActive ~= 0) or (ifnCompatability["AdvancedEffects"] and EffectManagerADND.isValidCheckEffect(rActor,v))) then
 		-- END COMPATIBILITY FOR ADVANCED EFFECTS
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
 			local bTargeted = EffectManager.isTargetedEffect(v);
 			local aEffectComps = EffectManager.parseEffect(sLabel);
-
 			-- Iterate through each effect component looking for a type match
 			local nMatch = 0;
 			for kEffectComp,sEffectComp in ipairs(aEffectComps) do
@@ -372,7 +388,7 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 					if EffectManager5E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
 						break;
 					end
-				
+
 				-- Check for match
 				elseif rEffectComp.original:lower() == sLowerEffect then
 					if bTargeted and not bIgnoreEffectTargets then
@@ -412,17 +428,21 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 end
 
 function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
-	
-	if debug == true then
-		print("conditionalhelper");
-	end
 	if not rActor then
 		return false;
 	end
 	
+	if ifnCompatability["AdvancedEffects"] then
+		local bReturn = false;
+	end
+
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+		if not ifnCompatability["AdvancedEffects"] then
 		local nActive = DB.getValue(v, "isactive", 0);
-		if (((not AdvancedEffects and nActive ~= 0) or (AdvancedEffects and EffectManagerADND.isValidCheckEffect(rActor,v))) and not StringManager.contains(aIgnore, v.getPath())) then
+		end
+		--if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
+		--if (EffectManagerADND.isValidCheckEffect(rActor,v) and not StringManager.contains(aIgnore, v.getNodeName())) then
+		if (not ifnCompatability["AdvancedEffects"] and (nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()))) or (ifnCompatability["AdvancedEffects"] and (EffectManagerADND.isValidCheckEffect(rActor,v) and not StringManager.contains(aIgnore, v.getNodeName()))) then
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
 			local aEffectComps = EffectManager.parseEffect(sLabel);
@@ -430,7 +450,7 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 			-- Iterate through each effect component looking for a type match
 			for _,sEffectComp in ipairs(aEffectComps) do
 				local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
-				
+
 				-- CHECK CONDITIONALS
 				if rEffectComp.type == "IF" then
 					if not EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
@@ -454,7 +474,7 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 					if EffectManager5E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
 						break;
 					end
-				
+
 				-- CHECK FOR AN ACTUAL EFFECT MATCH
 				elseif rEffectComp.original:lower() == sEffect then
 					if EffectManager.isTargetedEffect(v) then
