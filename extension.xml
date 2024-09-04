@@ -9,17 +9,16 @@
 		<version>1</version>
 		<loadorder>100</loadorder>
 		<description>
-			<text>Feature: Untrue Effects ver. 0.2 by Berwind</text>
+			<text>Feature: Untrue Effects ver. 1.0 by Berwind</text>
 			<author>Berwind</author>
 		</description>
 		<ruleset>
 			<name>5E</name>
 		</ruleset>
 	</properties>
-    <announcement text="IF NOT - Untrue Effects ver. 0.21 - USE IFN and IFTN to check if conditional is untrue" icon="IFN" font="chatfont"/>
+ <announcement text="IF NOT - Untrue Effects ver. 1.0 - USE IFN and IFTN to check if conditional is untrue.&#xA;Improved compatibility! Message me in forums with any issues." icon="IFN" font="chatfont"/>
 	<base>
     	<script name="EffectManagerUntrue" file="scripts/manager_effect_untrue.lua"/>
-		<includefile source="strings/untrue_options.xml"/>
 		<icon name="IFN" file="graphics/logos/ifn_small.png" />
 	</base>
  </root>
